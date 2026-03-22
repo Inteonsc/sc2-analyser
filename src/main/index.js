@@ -66,7 +66,7 @@ app.whenReady().then(() => {
         }
     });
     ipcMain.handle("get-default-path", () => {
-        return path.join(app.getPath("documents"), "Starcraft II", "Accounts");
+        return path.join(app.getPath("documents"), "StarCraft II", "Accounts");
     });
     ipcMain.handle("save-replay-folder", (_, folderPath) => {
         store.set("replayFolder", folderPath);

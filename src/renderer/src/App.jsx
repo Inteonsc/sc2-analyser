@@ -1,34 +1,26 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { useState, useEffect } from "react";
+import FirstTimeSetup from "./components/FirstTimeSetup";
+import ReplayLibrary from "./components/ReplayLibrary";
 
 function App() {
-  const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+    const [replayFolder, setReplayFolder] = useState(null);
+    const [theme, setTheme] = useState("blue");
 
-  return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
-  )
+    //add state replay folder
+    // effect for getting replay folder for
+    useEffect(() => {
+        window.api.getReplayFolder().then(setReplayFolder);
+    }, []);
+    useEffect(() => {
+        window.api.getTheme().then(setTheme);
+    }, []);
+    useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+    }, [theme]);
+    if (replayFolder === undefined) return null;
+    else if (replayFolder === null)
+        return <FirstTimeSetup onComplete={setReplayFolder} theme={theme} setTheme={setTheme} />;
+    else return <ReplayLibrary replayFolder={replayFolder} />;
 }
 
-export default App
+export default App;

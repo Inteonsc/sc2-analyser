@@ -6,7 +6,8 @@ const api = {
     getDefaultPath: () => ipcRenderer.invoke("get-default-path"),
     saveReplayFolder: (folderPath) => ipcRenderer.invoke("save-replay-folder", folderPath),
     getTheme: () => ipcRenderer.invoke("get-theme"),
-    saveTheme: (theme) => ipcRenderer.invoke("save-theme", theme)
+    saveTheme: (theme) => ipcRenderer.invoke("save-theme", theme),
+    scanReplays: () => ipcRenderer.invoke("scan-replays")
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

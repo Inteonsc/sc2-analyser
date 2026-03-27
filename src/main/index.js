@@ -1,9 +1,10 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
-import { join } from "path";
+import fs from "fs";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 import Store from "electron-store";
 import path from "path";
+import { SC2Replay } from "sc2js";
 
 const store = new Store();
 
@@ -16,7 +17,7 @@ function createWindow() {
         autoHideMenuBar: true,
         ...(process.platform === "linux" ? { icon } : {}),
         webPreferences: {
-            preload: join(__dirname, "../preload/index.js"),
+            preload: path.join(__dirname, "../preload/index.js"),
             sandbox: false
         }
     });
@@ -35,8 +36,23 @@ function createWindow() {
     if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
         mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
     } else {
-        mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
+        mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
     }
+}
+
+function findReplays(dir) {
+    const results = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            results.push(...findReplays(fullPath));
+        } else if (entry.name.endsWith(".SC2Replay")) {
+            results.push(fullPath);
+        }
+    }
+    return results;
 }
 
 // This method will be called when Electron has finished
@@ -78,6 +94,40 @@ app.whenReady().then(() => {
         if (theme) {
             store.set("theme", theme);
         }
+    });
+
+    ipcMain.handle("scan-replays", () => {
+        //TODO need to add filter functionality
+        const replaylocations = findReplays(store.get("replayFolder"));
+        const replays = [];
+        const length = replaylocations.length;
+        const log = [];
+        let i = 0;
+        for (const location of replaylocations) {
+            const replay = new SC2Replay(location);
+            //checks for metadata (very old replays dont have and we cant deal with them atm. also affects wol training files)
+            const metadata = replay.getMetadata();
+            if (!metadata) {
+                //console.log("skipping: ", location);
+                log.push({ type: "No Metadata", path: location });
+                continue;
+            }
+            const info = replay.getBasicInfo();
+            if (info.gamemode.gamemode == "Unknown") {
+                log.push({ type: "No Gamespeed", path: location });
+            }
+            i++;
+            if (i % 50 == 0) {
+                console.log("finished ", i, " out of ", length);
+            }
+            replays.push(info);
+        }
+        if (log.length > 0) {
+            const logPath = path.join(app.getPath("userData"), "scan-issues.log");
+            const lines = log.map((l) => JSON.stringify(l)).join("\n");
+            fs.writeFileSync(logPath, lines);
+        }
+        return replays;
     });
 
     createWindow();

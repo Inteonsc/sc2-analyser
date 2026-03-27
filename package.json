@@ -22,6 +22,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@tailwindcss/vite": "^4.2.2",
     "electron-store": "^8.2.0",
+    "sc2js": "file:../sc2js",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {

@@ -21,7 +21,9 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@tailwindcss/vite": "^4.2.2",
+    "@tanstack/react-table": "^8.21.3",
     "electron-store": "^8.2.0",
+    "lucide-react": "^1.7.0",
     "sc2js": "file:../sc2js",
     "tailwindcss": "^4.2.2"
   },

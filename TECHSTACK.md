@@ -5,5 +5,7 @@
 - **Vite** (via electron-vite) — build tool and dev server
 - **Tailwind CSS** — styling
 - **electron-store** — persistent settings storage
+- **Tanstack Tables** - table sorting
+- **Lucide** - Icons
 - **better-sqlite3** — replay index database (planned)
 - **sc2js** — replay parsing (local package)

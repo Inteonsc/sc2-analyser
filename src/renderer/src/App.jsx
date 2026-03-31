@@ -29,7 +29,7 @@ function App() {
 
     //Main div
     return (
-        <div className="relative flex h-screen w-full">
+        <div className="relative flex h-screen w-full min-w-0">
             <Sidebar onOpenSettings={() => setSettingsOpen(true)}></Sidebar>
 
             <main className="flex-1 overflow-hidden">

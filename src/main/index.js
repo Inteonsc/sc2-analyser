@@ -97,7 +97,6 @@ app.whenReady().then(() => {
     });
 
     ipcMain.handle("scan-replays", () => {
-        //TODO need to add filter functionality
         const replaylocations = findReplays(store.get("replayFolder"));
         const replays = [];
         const length = replaylocations.length;

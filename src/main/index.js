@@ -11,8 +11,8 @@ const store = new Store();
 function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 900,
-        height: 670,
+        width: 1280,
+        height: 720,
         show: false,
         autoHideMenuBar: true,
         ...(process.platform === "linux" ? { icon } : {}),
@@ -53,6 +53,13 @@ function findReplays(dir) {
         }
     }
     return results;
+}
+function sanitizeBigInt(obj) {
+    if (typeof obj === "bigint") return obj.toString();
+    if (Array.isArray(obj)) return obj.map(sanitizeBigInt);
+    if (obj !== null && typeof obj === "object")
+        return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, sanitizeBigInt(v)]));
+    return obj;
 }
 
 // This method will be called when Electron has finished
@@ -127,6 +134,11 @@ app.whenReady().then(() => {
             fs.writeFileSync(logPath, lines);
         }
         return replays;
+    });
+
+    ipcMain.handle("open-replay", (_, replayPath) => {
+        const replay = new SC2Replay(replayPath);
+        return sanitizeBigInt(replay.getFullInfo());
     });
 
     createWindow();

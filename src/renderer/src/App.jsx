@@ -10,6 +10,8 @@ function App() {
     const [theme, setTheme] = useState("blue");
     const [view, setView] = useState("library");
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [selectedReplay, setSelectedReplay] = useState(null);
+    const [replayInfos, setReplayInfos] = useState([]);
 
     // Effects
     useEffect(() => {
@@ -21,6 +23,12 @@ function App() {
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
     }, [theme]);
+
+    useEffect(() => {
+        if (replayFolder) {
+            window.api.scanReplays().then(setReplayInfos);
+        }
+    }, [replayFolder]);
 
     //Check if we need to do first time setup;
     if (replayFolder === undefined) return null;
@@ -35,12 +43,18 @@ function App() {
             <main className="flex-1 overflow-hidden">
                 {view === "library" && (
                     <ReplayLibrary
-                        replayFolder={replayFolder}
-                        onOpenReplay={() => setView("singleReplay")}
+                        replayInfos={replayInfos}
+                        onOpenReplay={(replay) => {
+                            setSelectedReplay(replay);
+                            setView("singleReplay");
+                        }}
                     />
                 )}
                 {view === "singleReplay" && (
-                    <SingleReplay onBack={() => setView("library")}></SingleReplay>
+                    <SingleReplay
+                        onBack={() => setView("library")}
+                        selectedReplay={selectedReplay}
+                    ></SingleReplay>
                 )}
             </main>
 
